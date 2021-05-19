@@ -2,6 +2,7 @@ import React from "react";
 import { Contract } from "@ethersproject/contracts";
 import { getDefaultProvider } from "@ethersproject/providers";
 import { useQuery } from "@apollo/react-hooks";
+import { ethers} from "ethers"
 
 import { Body, Button, Header, Image, Link } from "./components";
 import logo from "./ethereumLogo.png";
@@ -19,6 +20,17 @@ async function readOnChainData() {
   // A pre-defined address that owns some CEAERC20 tokens
   const tokenBalance = await ceaErc20.balanceOf("0x3f8CB69d9c0ED01923F11c829BaE4D9a4CB6c82C");
   console.log({ tokenBalance: tokenBalance.toString() });
+}
+
+async function signMessage(provider) {
+  const signer = provider.getSigner()
+  console.debug(signer)
+  console.debug("address", await signer.getAddress())
+  const message = "test message"
+  const signature = await signer.signMessage(message)
+  console.debug("signature", signature)
+  const recovered = await ethers.utils.verifyMessage(message, signature)
+  console.debug("recovered", recovered)
 }
 
 function WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal }) {
@@ -58,8 +70,8 @@ function App() {
           Edit <code>packages/react-app/src/App.js</code> and save to reload.
         </p>
         {/* Remove the "hidden" prop and open the JavaScript console in the browser to see what this function does */}
-        <Button hidden onClick={() => readOnChainData()}>
-          Read On-Chain Balance
+        <Button onClick={() => signMessage(provider)}>
+          Sign message
         </Button>
         <Link href="https://ethereum.org/developers/#getting-started" style={{ marginTop: "8px" }}>
           Learn Ethereum
